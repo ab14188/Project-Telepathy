@@ -182,6 +182,9 @@ def validate_participant(directory):
 def plot_confusion_matrix(cm) :
     gesture_nums = ('back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes')
 
+    if not os.path.exists("./CM") :
+        os.mkdir("CM")
+    
     file = 'confusion_matrix'
     fig = plt.figure()
     plt.clf()
@@ -224,7 +227,10 @@ def plot_confusion_matrix(cm) :
     plt.yticks(range(height), gesture_nums)
     ax.grid(True, alpha=0.2)
     #plt.show()
+    parentDir = os.getcwd()
+    os.chdir("./CM")
     plt.savefig(file + '.pdf', format='pdf', bbox_inches='tight')
+    os.chdir(parentDir)
 
 
 if __name__ == '__main__':
@@ -263,5 +269,4 @@ if __name__ == '__main__':
     # #print all_c_matrices
     # print (sum_c_matrices)
 
-# need to link all of them together such that i classify them against each other
-# classify them with all the data together 
+# run tests to determin which features work best 
