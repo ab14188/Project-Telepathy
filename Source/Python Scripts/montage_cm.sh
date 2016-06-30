@@ -5,7 +5,7 @@ mkdir tmp
 for d in ./user_study/results/*
 do 
 	echo $d
-	for file in $d$"/CM/*"
+	for file in $d$"/CM2/*"
 	do 
 		echo $file
 		montage $file -geometry 800x600 -tile 2x1 tmp/tmp"$i".pdf
@@ -13,6 +13,6 @@ do
 	done
 done
 
-convert tmp/* cm_montage.pdf
+convert tmp/* cm_montage2.pdf
 
 rm -r tmp
