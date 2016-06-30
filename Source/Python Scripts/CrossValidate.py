@@ -125,8 +125,8 @@ def cross_validate(words, trainingDir):
         best_G = grid.best_params_['gamma']
 
         # Different classifiers 
-        #result = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
-        result = LDA_classifier(trainingSet, trainingLabels, testingSet)
+        result = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
+        #result = LDA_classifier(trainingSet, trainingLabels, testingSet)
         #result = gaussian_classifier(trainingSet, trainingLabels, testingSet)
 
         predictions.append(result.tolist())
@@ -185,7 +185,7 @@ def plot_confusion_matrix(cm) :
     if not os.path.exists("./CM") :
         os.mkdir("CM")
     
-    file = 'confusion_matrix'
+    file = 'confusion_matrixSVM'
     fig = plt.figure()
     plt.clf()
     ax  = fig.add_subplot(111)
