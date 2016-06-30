@@ -9,6 +9,7 @@ import os
 import subprocess
 import csv
 import numpy as np
+import itertools
 
 def readFeatures(file):
 	features 	= []
@@ -75,6 +76,8 @@ def extract_features(dataFile):
 		feature_vector.append(np.sqrt(np.mean(np.square(data[:,i]))))		#2 # 56 Relates to constant force and non fatiguing contraction & energy information  
 		feature_vector.append(WL(data, i))								    #3 # 14 Relates to the complexity of the signal
 		feature_vector.append(np.std(data[:,i]))							###4 56 # Related to firing point & energy information
+		feature_vector.append(np.sum(data[:,i]))
+		#feature_vector.append(np.var(data[:,i]))
 	return feature_vector
 
 def WL(file, i) : # Relates to the complexity of the signal 
@@ -84,6 +87,20 @@ def WL(file, i) : # Relates to the complexity of the signal
 		WL_results.append(result)
 
 	return np.sum(WL_results)
+
+
+#Function that combines different features
+def combine_features(feature_array) :
+	combinations 	= []
+	featurenumb 	= int(len(feature_array)/4)
+	splitEMGS 		= [feature_array[x:x+featurenumb] for x in range(0, len(feature_array), featurenumb)]
+
+	for i in range(0, 3) :
+		combinations.append([])
+		for j in range(1, featurenumb) :
+			for subset in itertools.combinations(splitEMGS[i], j) :
+				combinations[i].append(np.asarray(subset))
+	return combinations
 
 if __name__ == '__main__':
 	#extract(argv[1])

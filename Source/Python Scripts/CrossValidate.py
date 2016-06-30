@@ -24,7 +24,7 @@ from time import sleep
 import sklearn
 
 # Different gesture types // note should be in alphabetised order
-gestureWords    = ['back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
+gestureWords    = ['back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
 words           = gestureWords
 
 
@@ -36,6 +36,7 @@ trainingDirs = [trainingDirAll]
 def load_features(words, trainingDir) : 
     parentPath  = os.getcwd()
     features    = []
+    features2   = []
     gestureArray = []
     os.chdir(trainingDir)                                                           # this changes the directory to the given path 
 
@@ -47,8 +48,13 @@ def load_features(words, trainingDir) :
             for dataFile in os.listdir(os.getcwd()):
                 result          = extract.extract_features(dataFile)                # Extract features from the file _ note removed the time features 
                 features.append(result)
+                #feature_combinations = extract.combine_features(result)
+                #features2.append(feature_combinations)
                 gestureArray.append(i)                                              # Keep track of the gesture labels
 
+    #x, y = np.shape(feature_combinations)
+
+    #for i in range(0, x+1) :  
 
     # Scaling the features 
     scaler          = StandardScaler().fit(features)
@@ -125,8 +131,8 @@ def cross_validate(words, trainingDir):
         best_G = grid.best_params_['gamma']
 
         # Different classifiers 
-        #result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
-        result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
+        result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
+        #result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
         #result, classifier  = gaussian_classifier(trainingSet, trainingLabels, testingSet)
 
         predictions.append(result.tolist())
@@ -272,4 +278,4 @@ if __name__ == '__main__':
     # #print all_c_matrices
     # print (sum_c_matrices)
 
-# run tests to determin which features work best 
+# run tests to determine which features work best 
