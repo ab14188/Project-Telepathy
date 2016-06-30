@@ -13,6 +13,6 @@ do
 	done
 done
 
-convert tmp/* cm_montage2.pdf
+convert tmp/* cm_montage3.pdf
 
 rm -r tmp
