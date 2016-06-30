@@ -13,6 +13,6 @@ do
 	let "i += 1"
 
 done
-convert tmp/* ./user_study/results/test0/montage.pdf
+convert tmp/* ./user_study/results/test"$1"/montage.pdf
 	
 rm -r tmp
