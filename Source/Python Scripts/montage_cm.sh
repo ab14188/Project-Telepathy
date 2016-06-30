@@ -10,6 +10,7 @@ do
 		echo $file
 		montage $file -geometry 800x600 -tile 2x1 tmp/tmp"$i".pdf
 		let "i += 1"
+	done
 done
 
 convert tmp/* cm_montage.pdf
