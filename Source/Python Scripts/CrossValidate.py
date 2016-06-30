@@ -25,7 +25,7 @@ import sklearn
 
 # Different gesture types // note should be in alphabetised order
 gestureWords    = ['back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
-words        = gestureWords
+words           = gestureWords
 
 
 # Different training directories __represent of different conditions 
@@ -125,8 +125,8 @@ def cross_validate(words, trainingDir):
         best_G = grid.best_params_['gamma']
 
         # Different classifiers 
-        result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
-        #result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
+        #result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
+        result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
         #result, classifier  = gaussian_classifier(trainingSet, trainingLabels, testingSet)
 
         predictions.append(result.tolist())
@@ -180,7 +180,7 @@ def validate_participant(directory):
     return cv_rates, c_matrices
 
 def plot_confusion_matrix(cm, classifier) :
-    gesture_nums = ('back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes')
+    gesture_nums = ('back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'stop', 'turn', 'up', 'yes')
 
     if not os.path.exists("./CM2") :
         os.mkdir("CM2")
