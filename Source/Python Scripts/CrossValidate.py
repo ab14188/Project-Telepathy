@@ -24,7 +24,7 @@ from time import sleep
 import sklearn
 
 # Different gesture types // note should be in alphabetised order
-gestureWords    = ['back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
+gestureWords    = ['back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
 words        = gestureWords
 
 
@@ -84,13 +84,13 @@ def SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet) :
     clf         = svm.SVC(C=best_C,gamma=best_G)
     clfoutput   = clf.fit(trainingSet, trainingLabels)
     result      = clf.predict(testingSet)
-    return result
+    return result , "SVM"
 
 def LDA_classifier(trainingSet, trainingLabels, testingSet) :
     clf         = LDA()
     clfoutput   = clf.fit(trainingSet, trainingLabels)
     result      = clf.predict(testingSet)      
-    return result
+    return result, "LDA"
 
 def gaussian_classifier(trainingSet, trainingLabels, testingSet) :
     clf         = GaussianNB()
@@ -125,9 +125,9 @@ def cross_validate(words, trainingDir):
         best_G = grid.best_params_['gamma']
 
         # Different classifiers 
-        result = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
-        #result = LDA_classifier(trainingSet, trainingLabels, testingSet)
-        #result = gaussian_classifier(trainingSet, trainingLabels, testingSet)
+        result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
+        #result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
+        #result, classifier  = gaussian_classifier(trainingSet, trainingLabels, testingSet)
 
         predictions.append(result.tolist())
         
@@ -160,7 +160,7 @@ def cross_validate(words, trainingDir):
     #print ("linear true: ", linear_true)
     c_matrix = confusion_matrix(linear_true, linear_pred) 
 
-    plot_confusion_matrix(c_matrix)
+    plot_confusion_matrix(c_matrix, classifier)
     return rate, c_matrix
 
 def validate_participant(directory):
@@ -179,13 +179,16 @@ def validate_participant(directory):
 
     return cv_rates, c_matrices
 
-def plot_confusion_matrix(cm) :
+def plot_confusion_matrix(cm, classifier) :
     gesture_nums = ('back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes')
 
-    if not os.path.exists("./CM") :
-        os.mkdir("CM")
+    if not os.path.exists("./CM2") :
+        os.mkdir("CM2")
     
-    file = 'confusion_matrixSVM'
+    if classifier == "SVM" : 
+        file = 'confusion_matrixSVM'
+    else: 
+        file = 'confusion_matrix' 
     fig = plt.figure()
     plt.clf()
     ax  = fig.add_subplot(111)
@@ -228,7 +231,7 @@ def plot_confusion_matrix(cm) :
     ax.grid(True, alpha=0.2)
     #plt.show()
     parentDir = os.getcwd()
-    os.chdir("./CM")
+    os.chdir("./CM2")
     plt.savefig(file + '.pdf', format='pdf', bbox_inches='tight')
     os.chdir(parentDir)
 
