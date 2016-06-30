@@ -24,12 +24,11 @@ from time import sleep
 import sklearn
 
 # Different gesture types // note should be in alphabetised order
-gestureWords    = ['back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
+gestureWords    = ['back', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
 words           = gestureWords
 
-
 # Different training directories __represent of different conditions 
-trainingDirAll = 'spoken' 
+trainingDirAll = 'spoken' # add mouthed for second condition 
 trainingDirs = [trainingDirAll]
 
 # Load data from files and extract features
@@ -46,22 +45,36 @@ def load_features(words, trainingDir) :
             #print("Gesture i: ", i )
             os.chdir(parentPath + "/" + trainingDir + "/" + i)
             for dataFile in os.listdir(os.getcwd()):
-                result          = extract.extract_features(dataFile)                # Extract features from the file _ note removed the time features 
+                result              = extract.extract_features(dataFile)                # Extract features from the file _ note removed the time features 
                 features.append(result)
-                #feature_combinations = extract.combine_features(result)
-                #features2.append(feature_combinations)
+                feature_combinations    = extract.combine_features(result)
+                features2.append(manipulate_combinations(feature_combinations))
                 gestureArray.append(i)                                              # Keep track of the gesture labels
 
-    #x, y = np.shape(feature_combinations)
 
-    #for i in range(0, x+1) :  
-
+    # unroll loop of features2 -- test for everything and determin which combination of features is best to use for each file then make final decision 
     # Scaling the features 
     scaler          = StandardScaler().fit(features)
     features_scaled = scaler.transform(features) 
-
+    
+    manipulate_combinations(feature_combinations)
     os.chdir(parentPath)
     return features_scaled, features, gestureArray                                                             
+
+
+# Function that reassembles the combinations properly to form feature vectors
+def manipulate_combinations(feature_combinations) :
+    numb_combinations   = len(feature_combinations[0])
+    features            = []
+
+    print(numb_combinations)
+    for i in range(0, numb_combinations) : 
+        features.append([])
+        for j in range(0, 4) : # numb EMGs
+            features[i].extend(feature_combinations[j][i])
+
+    return features
+
 
 # Choose training and Test data
 def separate_training_test(features_scaled, gestureArray, i) :
@@ -71,12 +84,8 @@ def separate_training_test(features_scaled, gestureArray, i) :
     testingSet      = []
     trainingLabels  = []
     testingLabels   = []
-    #currentGesture  = -1                       # to be used later on for label arrays
 
     for feature_vector in features_scaled:
-        #if count%10 == 0 :
-            #currentGesture += 1
-        #if count%4 == i or count%3 == i: 
         if count%10 == i : 
             testingSet.append(feature_vector)
             testingLabels.append(words.index(gestureArray[count])) 
@@ -102,9 +111,9 @@ def gaussian_classifier(trainingSet, trainingLabels, testingSet) :
     clf         = GaussianNB()
     clfoutput   = clf.fit(trainingSet, trainingLabels)
     result      = clf.predict(testingSet)      
-    return result
+    return result, "Gauss"
 
-def cross_validate(words, trainingDir):
+def cross_validate(trainingDir):
     features_scaled, features, gestureArray = load_features(words, trainingDir)
     predictions = []
     cum_rate = 0.0
@@ -131,8 +140,8 @@ def cross_validate(words, trainingDir):
         best_G = grid.best_params_['gamma']
 
         # Different classifiers 
-        result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
-        #result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
+        #result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
+        result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
         #result, classifier  = gaussian_classifier(trainingSet, trainingLabels, testingSet)
 
         predictions.append(result.tolist())
@@ -161,12 +170,10 @@ def cross_validate(words, trainingDir):
             linear_pred.append(j)
             linear_true.append(count)
             count += 1
-    
-    #print (linear_pred)
-    #print ("linear true: ", linear_true)
+
     c_matrix = confusion_matrix(linear_true, linear_pred) 
 
-    plot_confusion_matrix(c_matrix, classifier)
+    #plot_confusion_matrix(c_matrix, classifier)
     return rate, c_matrix
 
 def validate_participant(directory):
@@ -175,9 +182,7 @@ def validate_participant(directory):
 
     originalWorkingPath = os.getcwd()
     os.chdir(directory)
-    #print("Directory: ", dir, 'validating')
-    #for r in itertools.product(words, trainingDirs):
-    cv_rate, c_matrix = cross_validate(words, trainingDirs[0]) # this used to be r[0] r[1] 
+    cv_rate, c_matrix = cross_validate(trainingDirs[0]) 
     cv_rates.append(cv_rate)
     c_matrices.append(c_matrix)
     print("Rate ", np.round(cv_rate,2), " %")
@@ -185,6 +190,7 @@ def validate_participant(directory):
 
     return cv_rates, c_matrices
 
+# Function that saves the confusion matrices into different pdfs 
 def plot_confusion_matrix(cm, classifier) :
     gesture_nums = ('back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'stop', 'turn', 'up', 'yes')
 
@@ -235,9 +241,10 @@ def plot_confusion_matrix(cm, classifier) :
     plt.xticks(range(width), gesture_nums, rotation=45)
     plt.yticks(range(height), gesture_nums)
     ax.grid(True, alpha=0.2)
-    #plt.show()
+
+    # Save into a pdf file 
     parentDir = os.getcwd()
-    os.chdir("./CM2")
+    os.chdir("./CM2")                                           
     plt.savefig(file + '.pdf', format='pdf', bbox_inches='tight')
     os.chdir(parentDir)
 
@@ -247,9 +254,8 @@ if __name__ == '__main__':
     all_c_matrices = []             
     sum_c_matrices = []
 
+    # Iterate through all participants 
     for i in range (0,5):
-        #dir = 'Test0_' + str(i)
-        #dir = './try data/neck'
         dir = './user_study/results/test' + str(i)
         cv_rates, c_matrices = validate_participant(dir)
         print('C matrices result: \n', c_matrices)

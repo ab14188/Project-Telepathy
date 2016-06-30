@@ -1,0 +1,13 @@
+30/06/2016: * added a new feature_rate obtained much better
+			* implemented faster way to obtain montage pdfs of the confusion matrices 
+	//deleting some words such as 'no' also makes a better classification  
+
+To-do list: * Algorithm that runs through all the different feature combinations such as to determin which combination is the best
+			* try other classifiers
+			* get more training data
+			* combine all different training data and run a cross validation on it 
+
+
+test4 = mouthed of test3 
+
+the warning obtained from lda are in part due to the fact that lda does its own scaling 
