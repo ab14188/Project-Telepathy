@@ -9,6 +9,8 @@ import subprocess
 import extract
 import numpy as np
 import itertools
+import matplotlib 
+import matplotlib.pyplot as plt
 from sklearn import preprocessing
 from sklearn.metrics import confusion_matrix
 from sklearn.lda import LDA
@@ -157,6 +159,8 @@ def cross_validate(words, trainingDir):
     #print (linear_pred)
     #print ("linear true: ", linear_true)
     c_matrix = confusion_matrix(linear_true, linear_pred) 
+
+    plot_confusion_matrix(c_matrix)
     return rate, c_matrix
 
 def validate_participant(directory):
@@ -174,6 +178,54 @@ def validate_participant(directory):
     os.chdir(originalWorkingPath)
 
     return cv_rates, c_matrices
+
+def plot_confusion_matrix(cm) :
+    gesture_nums = ('back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes')
+
+    file = 'confusion_matrix'
+    fig = plt.figure()
+    plt.clf()
+    ax  = fig.add_subplot(111)
+    ax.set_aspect(1)
+
+    res = ax.imshow(np.array(cm), cmap=plt.cm.Blues, 
+                    interpolation='nearest')
+
+    width   = len(cm)
+    height  = len(cm[0])
+
+    for x in range(width):
+        for y in range(height):
+            if cm[x][y] > 0:
+                if cm[x][y] > 4:
+                    ax.annotate(str(cm[x][y]), xy=(y, x), 
+                        horizontalalignment='center',
+                        verticalalignment='center', color = 'white',
+                        fontsize = 11)
+                elif cm[x][y] < 2:
+                    ax.annotate(str(cm[x][y]), xy=(y, x), 
+                        horizontalalignment='center',
+                        verticalalignment='center', color = 'black',
+                        fontsize = 11)
+                else:
+                    ax.annotate(str(cm[x][y]), xy=(y, x), 
+                        horizontalalignment='center',
+                        verticalalignment='center', color = 'gray',
+                        fontsize = 11)
+                        
+    res.set_clim(vmin=0, vmax=5)
+
+    cb = fig.colorbar(res)
+
+    plt.xlabel('True')
+    plt.ylabel('Predicted')
+    
+    plt.xticks(range(width), gesture_nums, rotation=45)
+    plt.yticks(range(height), gesture_nums)
+    ax.grid(True, alpha=0.2)
+    #plt.show()
+    plt.savefig(file + '.pdf', format='pdf', bbox_inches='tight')
+
 
 if __name__ == '__main__':
     print('The scikit-learn version is {}.'.format(sklearn.__version__))
