@@ -47,17 +47,17 @@ def load_features(words, trainingDir) :
             for dataFile in os.listdir(os.getcwd()):
                 result              = extract.extract_features(dataFile)                # Extract features from the file _ note removed the time features 
                 features.append(result)
-                feature_combinations    = extract.combine_features(result)
-                features2.append(manipulate_combinations(feature_combinations))
+                #feature_combinations    = extract.combine_features(result)
+                #features2.append(manipulate_combinations(feature_combinations))
                 gestureArray.append(i)                                              # Keep track of the gesture labels
 
 
-    # unroll loop of features2 -- test for everything and determin which combination of features is best to use for each file then make final decision 
+    # unroll loop of features2 -- test for everything and determine which combination of features is best to use for each file then make final decision 
     # Scaling the features 
     scaler          = StandardScaler().fit(features)
     features_scaled = scaler.transform(features) 
     
-    manipulate_combinations(feature_combinations)
+    #manipulate_combinations(feature_combinations)
     os.chdir(parentPath)
     return features_scaled, features, gestureArray                                                             
 
@@ -67,7 +67,7 @@ def manipulate_combinations(feature_combinations) :
     numb_combinations   = len(feature_combinations[0])
     features            = []
 
-    print(numb_combinations)
+    #print(numb_combinations)
     for i in range(0, numb_combinations) : 
         features.append([])
         for j in range(0, 4) : # numb EMGs
@@ -140,8 +140,8 @@ def cross_validate(trainingDir):
         best_G = grid.best_params_['gamma']
 
         # Different classifiers 
-        #result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
-        result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
+        result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
+        #result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
         #result, classifier  = gaussian_classifier(trainingSet, trainingLabels, testingSet)
 
         predictions.append(result.tolist())
@@ -173,7 +173,7 @@ def cross_validate(trainingDir):
 
     c_matrix = confusion_matrix(linear_true, linear_pred) 
 
-    #plot_confusion_matrix(c_matrix, classifier)
+    plot_confusion_matrix(c_matrix, classifier)
     return rate, c_matrix
 
 def validate_participant(directory):
@@ -194,8 +194,8 @@ def validate_participant(directory):
 def plot_confusion_matrix(cm, classifier) :
     gesture_nums = ('back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'stop', 'turn', 'up', 'yes')
 
-    if not os.path.exists("./CM2") :
-        os.mkdir("CM2")
+    if not os.path.exists("./CM_newf") :
+        os.mkdir("CM_newf")
     
     if classifier == "SVM" : 
         file = 'confusion_matrixSVM'
@@ -244,7 +244,7 @@ def plot_confusion_matrix(cm, classifier) :
 
     # Save into a pdf file 
     parentDir = os.getcwd()
-    os.chdir("./CM2")                                           
+    os.chdir("./CM_newf")                                           
     plt.savefig(file + '.pdf', format='pdf', bbox_inches='tight')
     os.chdir(parentDir)
 

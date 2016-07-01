@@ -72,7 +72,7 @@ def extract_features(dataFile):
 	for i in range(0, 4) :  # up to the number of sensors used 
 		feature_vector.append(np.mean(data[:,i]))	      					#0  55 # Related to firing point & energy information
 		feature_vector.append(np.amax(data[:,i]))							#1  51 # Related to firing point & energy information
-		#feature_vector.append(np.amin(data[:,i]))							##  51
+		feature_vector.append(np.amin(data[:,i]))							##  51
 		feature_vector.append(np.sqrt(np.mean(np.square(data[:,i]))))		#2 # 56 Relates to constant force and non fatiguing contraction & energy information  
 		#feature_vector.append(WL(data, i))								    #3 # 14 Relates to the complexity of the signal
 		#feature_vector.append(np.std(data[:,i]))							###4 56 # Related to firing point & energy information
