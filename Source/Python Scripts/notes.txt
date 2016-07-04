@@ -1,6 +1,6 @@
 30/06/2016: * added a new feature_rate obtained much better
 			* implemented faster way to obtain montage pdfs of the confusion matrices 
-	//deleting some words such as 'no' also makes a better classification  
+	//deleting some words such as 'no' also makes a better classification  + forwards 
 
 To-do list: * Algorithm that runs through all the different feature combinations such as to determin which combination is the best
 			* try other classifiers

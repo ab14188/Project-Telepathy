@@ -140,8 +140,8 @@ def cross_validate(trainingDir):
         best_G = grid.best_params_['gamma']
 
         # Different classifiers 
-        result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
-        #result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
+        #result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
+        result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
         #result, classifier  = gaussian_classifier(trainingSet, trainingLabels, testingSet)
 
         predictions.append(result.tolist())
@@ -173,7 +173,7 @@ def cross_validate(trainingDir):
 
     c_matrix = confusion_matrix(linear_true, linear_pred) 
 
-    plot_confusion_matrix(c_matrix, classifier)
+    #plot_confusion_matrix(c_matrix, classifier)
     return rate, c_matrix
 
 def validate_participant(directory):
