@@ -149,12 +149,8 @@ def cross_validate(trainingDir):
 
         # Different classifiers 
         #result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
-<<<<<<< HEAD
-        result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
-=======
         #result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
         result, classifier = MLP_classifier(trainingSet, trainingLabels, testingSet)
->>>>>>> 424461fd22338a7b63b9bbabb324b82756e54e22
         #result, classifier  = gaussian_classifier(trainingSet, trainingLabels, testingSet)
 
         predictions.append(result.tolist())
