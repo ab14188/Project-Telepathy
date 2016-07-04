@@ -182,11 +182,7 @@ def cross_validate(trainingDir):
 
     c_matrix = confusion_matrix(linear_true, linear_pred) 
 
-<<<<<<< HEAD
-=======
-
 # need to modify some things when running the plot confusion matrix, does not work with ssh 
->>>>>>> 424461fd22338a7b63b9bbabb324b82756e54e22
     #plot_confusion_matrix(c_matrix, classifier)
     return rate, c_matrix
 
