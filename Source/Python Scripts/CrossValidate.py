@@ -15,16 +15,18 @@ from sklearn import preprocessing
 from sklearn.metrics import confusion_matrix
 from sklearn.lda import LDA
 from sklearn import svm
+from sklearn.neural_network import MLPClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.grid_search import GridSearchCV
 from sklearn.preprocessing import StandardScaler
-from svmutil import * 
+from sklearn.multiclass import OneVsRestClassifier
+#from svmutil import * 
 from time import sleep
 import sklearn
 
 # Different gesture types // note should be in alphabetised order
-gestureWords    = ['back', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
+gestureWords    = ['back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
 words           = gestureWords
 
 # Different training directories __represent of different conditions 
@@ -101,6 +103,12 @@ def SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet) :
     result      = clf.predict(testingSet)
     return result , "SVM"
 
+def MLP_classifier(trainingSet, trainingLabels, testingSet):
+    clf = OneVsRestClassifier(MLPClassifier(algorithm='l-bfgs', alpha=1e-1, hidden_layer_sizes=(15, ), random_state=1)    )
+    clfoutput   = clf.fit(trainingSet, trainingLabels)
+    result      = clf.predict(testingSet)            
+    return result, "MLP"
+
 def LDA_classifier(trainingSet, trainingLabels, testingSet) :
     clf         = LDA()
     clfoutput   = clf.fit(trainingSet, trainingLabels)
@@ -141,7 +149,12 @@ def cross_validate(trainingDir):
 
         # Different classifiers 
         #result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
+<<<<<<< HEAD
         result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
+=======
+        #result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
+        result, classifier = MLP_classifier(trainingSet, trainingLabels, testingSet)
+>>>>>>> 424461fd22338a7b63b9bbabb324b82756e54e22
         #result, classifier  = gaussian_classifier(trainingSet, trainingLabels, testingSet)
 
         predictions.append(result.tolist())
@@ -173,6 +186,11 @@ def cross_validate(trainingDir):
 
     c_matrix = confusion_matrix(linear_true, linear_pred) 
 
+<<<<<<< HEAD
+=======
+
+# need to modify some things when running the plot confusion matrix, does not work with ssh 
+>>>>>>> 424461fd22338a7b63b9bbabb324b82756e54e22
     #plot_confusion_matrix(c_matrix, classifier)
     return rate, c_matrix
 
