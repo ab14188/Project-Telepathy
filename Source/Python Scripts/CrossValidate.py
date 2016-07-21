@@ -13,9 +13,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 from sklearn import preprocessing
 from sklearn.metrics import confusion_matrix
-from sklearn.lda import LDA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn import svm
-from sklearn.neural_network import MLPClassifier
+#from sklearn.neural_network import MLPClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.grid_search import GridSearchCV
@@ -23,10 +23,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.multiclass import OneVsRestClassifier
 #from svmutil import * 
 from time import sleep
+from sklearn.neighbors import KDTree
 import sklearn
 
 # Different gesture types // note should be in alphabetised order
-gestureWords    = ['back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
+gestureWords    = ['back', 'faster', 'forwards', 'left', 'no', 'right', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
 words           = gestureWords
 
 # Different training directories __represent of different conditions 
@@ -49,8 +50,6 @@ def load_features(words, trainingDir) :
             for dataFile in os.listdir(os.getcwd()):
                 result              = extract.extract_features(dataFile)                # Extract features from the file _ note removed the time features 
                 features.append(result)
-                #feature_combinations    = extract.combine_features(result)
-                #features2.append(manipulate_combinations(feature_combinations))
                 gestureArray.append(i)                                              # Keep track of the gesture labels
 
 
@@ -58,25 +57,8 @@ def load_features(words, trainingDir) :
     # Scaling the features 
     scaler          = StandardScaler().fit(features)
     features_scaled = scaler.transform(features) 
-    
-    #manipulate_combinations(feature_combinations)
     os.chdir(parentPath)
     return features_scaled, features, gestureArray                                                             
-
-
-# Function that reassembles the combinations properly to form feature vectors
-def manipulate_combinations(feature_combinations) :
-    numb_combinations   = len(feature_combinations[0])
-    features            = []
-
-    #print(numb_combinations)
-    for i in range(0, numb_combinations) : 
-        features.append([])
-        for j in range(0, 4) : # numb EMGs
-            features[i].extend(feature_combinations[j][i])
-
-    return features
-
 
 # Choose training and Test data
 def separate_training_test(features_scaled, gestureArray, i) :
@@ -103,11 +85,11 @@ def SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet) :
     result      = clf.predict(testingSet)
     return result , "SVM"
 
-def MLP_classifier(trainingSet, trainingLabels, testingSet):
-    clf = OneVsRestClassifier(MLPClassifier(algorithm='l-bfgs', alpha=1e-1, hidden_layer_sizes=(15, ), random_state=1)    )
-    clfoutput   = clf.fit(trainingSet, trainingLabels)
-    result      = clf.predict(testingSet)            
-    return result, "MLP"
+# def MLP_classifier(trainingSet, trainingLabels, testingSet):
+#     clf = OneVsRestClassifier(MLPClassifier(algorithm='l-bfgs', alpha=1e-1, hidden_layer_sizes=(15, ), random_state=1)    )
+#     clfoutput   = clf.fit(trainingSet, trainingLabels)
+#     result      = clf.predict(testingSet)            
+#     return result, "MLP"
 
 def LDA_classifier(trainingSet, trainingLabels, testingSet) :
     clf         = LDA()
@@ -149,8 +131,8 @@ def cross_validate(trainingDir):
 
         # Different classifiers 
         #result, classifier = SVM_classifier(best_C, best_G, trainingSet, trainingLabels, testingSet)
-        #result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
-        result, classifier = MLP_classifier(trainingSet, trainingLabels, testingSet)
+        result, classifier = LDA_classifier(trainingSet, trainingLabels, testingSet)
+        #result, classifier = MLP_classifier(trainingSet, trainingLabels, testingSet)
         #result, classifier  = gaussian_classifier(trainingSet, trainingLabels, testingSet)
 
         predictions.append(result.tolist())
@@ -165,7 +147,7 @@ def cross_validate(trainingDir):
         best_percentage = percentage
 
         cum_rate += best_percentage
-        #print (np.round(percentage,2), '%')
+        print (np.round(percentage,2), '%')
     
     #print predictions
     rate = cum_rate / 10.0
@@ -202,10 +184,10 @@ def validate_participant(directory):
 
 # Function that saves the confusion matrices into different pdfs 
 def plot_confusion_matrix(cm, classifier) :
-    gesture_nums = ('back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'stop', 'turn', 'up', 'yes')
+    gesture_nums = ('back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'stop', 'up', 'yes')
 
-    if not os.path.exists("./CM_newf") :
-        os.mkdir("CM_newf")
+    if not os.path.exists("./CM_rmslower") :
+        os.mkdir("CM_rmslower")
     
     if classifier == "SVM" : 
         file = 'confusion_matrixSVM'
@@ -254,7 +236,7 @@ def plot_confusion_matrix(cm, classifier) :
 
     # Save into a pdf file 
     parentDir = os.getcwd()
-    os.chdir("./CM_newf")                                           
+    os.chdir("./CM_rmslower")                                           
     plt.savefig(file + '.pdf', format='pdf', bbox_inches='tight')
     os.chdir(parentDir)
 
@@ -265,7 +247,7 @@ if __name__ == '__main__':
     sum_c_matrices = []
 
     # Iterate through all participants 
-    for i in range (0,5):
+    for i in range (0,6):
         dir = './user_study/results/test' + str(i)
         cv_rates, c_matrices = validate_participant(dir)
         print('C matrices result: \n', c_matrices)

@@ -13,11 +13,11 @@ from time import sleep
 
 numDataVals = 120 # 10 * 12 words 
 
-trainingDir = 'user_study/Results/test4/spoken/'
+trainingDir = 'user_study/results/test4/mouthed/'
 
 parentPath = os.getcwd()
 
-graphDir = parentPath + '/user_study/results/test4/Graphs' 
+graphDir = parentPath + '/user_study/results/test4/Graphs_mouthed' 
 print ('printing')
 print (parentPath)
 print (graphDir)
