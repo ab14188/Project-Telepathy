@@ -27,11 +27,11 @@ from sklearn.neighbors import KDTree
 import sklearn
 
 # Different gesture types // note should be in alphabetised order
-gestureWords    = ['back', 'faster', 'forwards', 'left', 'no', 'right', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
+gestureWords    = ['back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes'] # when i do not have all the classes in tthe measured data it gives me a bad rate -- this is normal  
 words           = gestureWords
 
 # Different training directories __represent of different conditions 
-trainingDirAll = 'spoken' # add mouthed for second condition 
+trainingDirAll = 'mouthed' # add mouthed for second condition 
 trainingDirs = [trainingDirAll]
 
 # Load data from files and extract features
@@ -147,12 +147,12 @@ def cross_validate(trainingDir):
         best_percentage = percentage
 
         cum_rate += best_percentage
-        print (np.round(percentage,2), '%')
+        #print (np.round(percentage,2), '%')
     
     #print predictions
     rate = cum_rate / 10.0
 
-    #print(np.round(rate,2), '%')
+    print(np.round(rate,2), '%')
     linear_pred = []
     linear_true = []
     for i in predictions:
@@ -177,22 +177,22 @@ def validate_participant(directory):
     cv_rate, c_matrix = cross_validate(trainingDirs[0]) 
     cv_rates.append(cv_rate)
     c_matrices.append(c_matrix)
-    print("Rate ", np.round(cv_rate,2), " %")
+    #print("Rate ", np.round(cv_rate,2), " %")
     os.chdir(originalWorkingPath)
 
     return cv_rates, c_matrices
 
 # Function that saves the confusion matrices into different pdfs 
 def plot_confusion_matrix(cm, classifier) :
-    gesture_nums = ('back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'stop', 'up', 'yes')
+    gesture_nums = ('back', 'down', 'faster', 'forwards', 'left', 'no', 'right', 'slower', 'stop', 'turn', 'up', 'yes')
 
-    if not os.path.exists("./CM_rmslower") :
-        os.mkdir("CM_rmslower")
+    if not os.path.exists("./CM_total") :
+        os.mkdir("CM_total")
     
     if classifier == "SVM" : 
         file = 'confusion_matrixSVM'
     else: 
-        file = 'confusion_matrix' 
+        file = 'confusion_matrix_mouthed' 
     fig = plt.figure()
     plt.clf()
     ax  = fig.add_subplot(111)
@@ -236,7 +236,7 @@ def plot_confusion_matrix(cm, classifier) :
 
     # Save into a pdf file 
     parentDir = os.getcwd()
-    os.chdir("./CM_rmslower")                                           
+    os.chdir("./CM_total")                                           
     plt.savefig(file + '.pdf', format='pdf', bbox_inches='tight')
     os.chdir(parentDir)
 
@@ -250,7 +250,7 @@ if __name__ == '__main__':
     for i in range (0,6):
         dir = './user_study/results/test' + str(i)
         cv_rates, c_matrices = validate_participant(dir)
-        print('C matrices result: \n', c_matrices)
+        #print('C matrices result: \n', c_matrices)
         all_c_matrices.append(c_matrices)
 
     first = True
@@ -263,17 +263,18 @@ if __name__ == '__main__':
                 sum_c_matrices[idy] = sum_c_matrices[idy] + all_c_matrices[idx][idy]
 
 
-    #print("SUM_c matrices: ", sum_c_matrices)
-
-    # sum_c_matrices[:] = [((x * 100.0) / 120.0) for x in sum_c_matrices]
+    print("SUM_c matrices: ", sum_c_matrices)
+    print(sum_c_matrices[0].shape)
+    plot_confusion_matrix(sum_c_matrices[0], "LDA")
+    #sum_c_matrices[:] = [((x * 100.0) / 120.0) for x in sum_c_matrices]
     # for x in sum_c_matrices:
     #     for y in x:
     #         for idx, z in enumerate(y):
     #             if idx != len(y) - 1:
-    #                 print('%d,' % z), 
+    #                 #print('%d,' % z), 
     #             else:
-    #                 print ('%d' % z)
-    # #print all_c_matrices
-    # print (sum_c_matrices)
+    #                 #print ('%d' % z)
+    #print (all_c_matrices)
+    #print (sum_c_matrices)
 
 # run tests to determine which features work best 
